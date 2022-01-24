@@ -49,6 +49,7 @@ public class Game {
             this.printGameField();
             victory = this.isVictory();
             if (victory){
+                System.out.println(this.currentTurn.equals("user") ? "Победила матрица":"Ты победил!");
                 System.out.println("GAME OVER");
                 return;
             }
@@ -60,12 +61,27 @@ public class Game {
     }
 
     void aiTurn(){
-        this.x = this.random.nextInt(this.FIELD_SIZE);
-        this.y = this.random.nextInt(this.FIELD_SIZE);
-        if (checkIsCoordinatesIncorrect(x, y)) {
-            this.aiTurn();
+        boolean isVictoryNear = false;
+        for (int i=0; i<this.FIELD_SIZE; i++){
+            for (int j=0; j<this.FIELD_SIZE; j++){
+                if (!this.checkIsCoordinatesIncorrect(i, j)) {
+                    this.GameField[i][j] = this.USER_SIGN;
+                    if (this.isVictory()) {
+                        isVictoryNear = true;
+                        this.GameField[i][j] = this.AI_SIGN;
+                    } else this.GameField[i][j] = '.';
+                }
+            }
         }
-        this.GameField[x][y] = this.AI_SIGN;
+        if (!isVictoryNear) {
+
+            this.x = this.random.nextInt(this.FIELD_SIZE);
+            this.y = this.random.nextInt(this.FIELD_SIZE);
+            if (checkIsCoordinatesIncorrect(x, y)) {
+                this.aiTurn();
+            }
+            this.GameField[x][y] = this.AI_SIGN;
+        }
         this.currentTurn = "user";
     }
 
@@ -90,12 +106,10 @@ public class Game {
         String[] checkVictory = this.getAllPossibleLines();
         for (String s: checkVictory){
             if (s.contains(this.USER_VICTORY)){
-                System.out.println("Ты победил!");
                 return true;
 
             }
             else if(s.contains(this.AI_VICTORY)){
-                System.out.println("Победила матрица");
                 return true;
             }
         }
